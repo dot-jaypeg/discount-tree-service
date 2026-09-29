@@ -39,8 +39,8 @@
   --muted-light: rgba(255,255,255,.68);
 
   --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --maxw: 1280px;
-  --gutter: clamp(16px, 4vw, 40px);
+  --maxw: 1680px;
+  --gutter: clamp(16px, 5.5vw, 120px);
   --radius: 14px;
   --radius-lg: 24px;
   --cut: 56px;
@@ -80,8 +80,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .wrap-narrow { width: min(100% - 2 * var(--gutter), 880px); margin-inline: auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.section { padding-block: clamp(80px, 11vw, 150px); position: relative; }
-.section-tight { padding-block: clamp(64px, 8vw, 110px); }
+.section { padding-block: clamp(72px, 9vw, 180px); position: relative; }
+.section-tight { padding-block: clamp(56px, 6.5vw, 130px); }
 .bg-paper { background: var(--paper); }
 .bg-sand { background: var(--sand); }
 .bg-dark { background: var(--ink); color: #fff; }
@@ -182,7 +182,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
   box-shadow: 0 1px 0 rgba(255,255,255,.06);
 }
-.site-header.is-hidden { transform: translateY(-100%); }
 .site-header .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .logo { display: block; flex: none; }
 .logo img { height: 78px; width: auto; }
@@ -229,11 +228,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nav-open .nav-toggle span::after { transform: rotate(-45deg); }
 
 @media (max-width: 1000px) {
-  .main-nav, .header-cta .btn:not(.header-phone-btn) { display: none; }
+  .main-nav { display: none; }
   .nav-toggle { display: grid; }
 }
 
-@media (max-width: 560px) { .header-phone-btn { width: 46px; padding: 0; } .header-phone-btn .ph-num { display: none; } }
+@media (max-width: 700px) { .header-phone-btn { width: 46px; padding: 0; } .header-phone-btn .ph-num { display: none; } }
+@media (max-width: 460px) { .header-cta .btn:not(.header-phone-btn) { display: none; } }
 
 /* Mobile menu */
 .mobile-menu {

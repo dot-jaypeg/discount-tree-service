@@ -23,8 +23,6 @@
     var threshold = hero ? Math.max(hero.offsetHeight - 200, 200) : 60;
     if (header) {
       header.classList.toggle('is-stuck', y > 60);
-      var goingDown = y > lastY && y > 400;
-      header.classList.toggle('is-hidden', goingDown && !document.body.classList.contains('nav-open'));
     }
     var est = document.getElementById('estimate');
     var estR = est ? est.getBoundingClientRect() : null;
