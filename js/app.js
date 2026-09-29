@@ -66,7 +66,11 @@
     var step = parseFloat(group.getAttribute('data-stagger')) || 0.1;
     $$('[data-reveal]', group).forEach(function (el, i) { el.style.setProperty('--d', (i * step).toFixed(2) + 's'); });
   });
-  var revealEls = $$('[data-reveal]');
+  // Hero content animates in on load, not on scroll (it can sit below the observer's bottom margin).
+  $$('.hero [data-reveal]').forEach(function (el) {
+    requestAnimationFrame(function () { setTimeout(function () { el.classList.add('is-in'); }, 150); });
+  });
+  var revealEls = $$('[data-reveal]').filter(function (el) { return !el.closest('.hero'); });
   if ('IntersectionObserver' in window && !reduceMotion) {
     // Clip reveals start fully clipped (zero visible area), so observe their parent instead.
     var io = new IntersectionObserver(function (entries) {
