@@ -7,6 +7,11 @@
 
   var doc = document.documentElement;
   doc.classList.add('js');
+
+  // Show the clean URL (/) instead of /index.html
+  if (/\/index\.html$/.test(location.pathname) && history.replaceState) {
+    history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.search + location.hash);
+  }
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
