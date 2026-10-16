@@ -207,15 +207,90 @@
     });
   });
 
-  /* ---------- Estimate form (front-end prototype) ----------
-     Validates and shows a success state. Wire `submitLead` to GHL / CRM later. */
+  /* ---------- Estimate form -> GoHighLevel ----------
+     Posts straight from the browser to the GHL inbound webhook (no server).
+     Show success only on a 2xx; on failure, point the visitor to the phone. */
+  var GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/khYD7nTdnL0vNubv57I8/webhook-trigger/30242eb1-1a00-43bf-acb0-ea65cb06ead0';
+  var ATTR_KEY = 'dt_attr';
+  var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
+
+  // First-touch attribution: captured on whatever page the visitor lands on, never overwritten.
+  var attribution = (function () {
+    var s = {};
+    try { s = JSON.parse(localStorage.getItem(ATTR_KEY) || '{}'); } catch (e) {}
+    if (s._captured) return s;
+    var q = new URLSearchParams(location.search);
+    var a = { _captured: new Date().toISOString(), landing_page: location.pathname + location.search, referrer: document.referrer || '' };
+    UTM_KEYS.forEach(function (k) { a[k] = q.get(k) || ''; });
+    try { localStorage.setItem(ATTR_KEY, JSON.stringify(a)); } catch (e) {}
+    return a;
+  })();
+
+  function toE164(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (d.length === 10) return '+1' + d;
+    if (d.length === 11 && d[0] === '1') return '+' + d;
+    return String(raw || '').trim();
+  }
+  function newEventId() {
+    return window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+  }
+
+  function buildLeadPayload(form, eventId) {
+    var data = {};
+    new FormData(form).forEach(function (v, k) {
+      if (k === 'website') return; // honeypot
+      data[k === 'service' ? 'service_needed' : k] = typeof v === 'string' ? v.trim() : v;
+    });
+    var parts = (data.name || '').split(/\s+/).filter(Boolean);
+    data.full_name = data.name || '';
+    data.first_name = parts.shift() || '';
+    data.last_name = parts.join(' ');
+    delete data.name;
+    data.phone = toE164(data.phone);
+    data.service_needed = data.service_needed || '';
+    var slug = location.pathname.replace(/\/+$/, '').replace(/\.html$/, '').replace(/^.*\//, '') || 'home';
+    if (slug === 'index') slug = 'home';
+    data.source = 'Website';
+    data.form_source = 'Estimate Form';
+    data.form_name = slug;
+    data.form_id = form.id || 'estimate-form';
+    data.page_url = location.href.split('#')[0];
+    data.submitted_at = new Date().toISOString();
+    UTM_KEYS.concat(['referrer', 'landing_page']).forEach(function (k) { data[k] = attribution[k] || ''; });
+    data.event_id = eventId;
+    return data;
+  }
+
   function submitLead(data) {
-    // TODO: replace with GHL webhook / CRM endpoint once provided.
-    return new Promise(function (resolve) { setTimeout(resolve, 700); });
+    return fetch(GHL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('GHL webhook ' + r.status);
+      return r;
+    });
   }
 
   $$('form[data-estimate]').forEach(function (form) {
     var card = form.closest('.form-card');
+    var busy = false;
+
+    // Honeypot: off-screen field humans never see; bots fill it.
+    var hpWrap = document.createElement('div');
+    hpWrap.className = 'form-hp';
+    hpWrap.setAttribute('aria-hidden', 'true');
+    hpWrap.innerHTML = '<label>Website <input name="website" type="text" value="" tabindex="-1" autocomplete="off"></label>';
+    form.appendChild(hpWrap);
+
+    var errBox = document.createElement('p');
+    errBox.className = 'form-error';
+    errBox.setAttribute('role', 'alert');
+    errBox.hidden = true;
+    errBox.innerHTML = 'We couldn\u2019t send your request. Please call or text us at <a href="tel:+19097200145">(909) 720-0145</a>.';
+    var note = $('.form-note', form);
+    form.insertBefore(errBox, note || null);
     var phone = form.querySelector('input[type="tel"]');
     if (phone) {
       phone.addEventListener('input', function () {
@@ -252,15 +327,26 @@
         if (first) first.focus();
         return;
       }
+      if (busy) return;
+      var hp = form.querySelector('input[name="website"]');
+      if (hp && hp.value.trim()) { if (card) card.classList.add('sent'); form.reset(); return; } // bot
       var btn = $('button[type="submit"]', form);
       var label = btn.innerHTML;
+      busy = true;
       btn.disabled = true;
       btn.innerHTML = 'Sending…';
-      submitLead(Object.fromEntries(new FormData(form))).then(function () {
+      errBox.hidden = true;
+      var eventId = newEventId();
+      submitLead(buildLeadPayload(form, eventId)).then(function () {
+        if (window.gtag) window.gtag('event', 'generate_lead', { event_id: eventId, currency: 'USD' });
         if (card) card.classList.add('sent');
+        form.reset();
+      }).catch(function () {
+        errBox.hidden = false;
+      }).then(function () {
+        busy = false;
         btn.disabled = false;
         btn.innerHTML = label;
-        form.reset();
       });
     });
   });

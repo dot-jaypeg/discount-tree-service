@@ -9,6 +9,7 @@ Pure static HTML/CSS/JS (no build step, no frameworks). Open `index.html` or ser
 - Nav: Home · Services (dropdown) · Our Work (`index.html#work`) · About · Contact (`#estimate` form on every page), plus a phone button and a Free Estimate button
 - `css/styles.css` — all styles; tokens on `:root`
 - `js/app.js` — reveals, parallax, pinned horizontal gallery, counters, step progress, reviews slider, FAQ, form
+- Estimate form posts directly from the browser to the GHL inbound webhook (`GHL_WEBHOOK_URL` in `js/app.js`). No server. Payload keys: first_name, last_name, full_name, phone (E.164), email, city, service_needed, message, form_name (page slug), page_url, utm_*/gclid/fbclid, referrer, landing_page, event_id. Renaming a field or option value changes what GHL receives.
 - Header, footer, form and shared sections are duplicated in every page. Change all 6 when editing them.
 - Every heading (h1–h4) uses title case.
 
@@ -24,6 +25,5 @@ Pure static HTML/CSS/JS (no build step, no frameworks). Open `index.html` or ser
 - Reviews are real quotes from Yelp and BuildZoom. Replace them with Google Business Profile reviews once pulled.
 
 ## Pending
-- Contact form is a front-end prototype. Wire `submitLead()` in `js/app.js` to GHL or the CRM.
 - Google Ads tag (AW-986563782) from the old LP isn't carried over yet. Add it at launch.
 - Swap in more real job photos (Instagram / client) as they arrive.

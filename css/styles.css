@@ -666,6 +666,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 .form-success p { color: var(--muted); }
 .form-card.sent form { display: none; }
 .form-card.sent .form-success { display: block; animation: rise .6s var(--ease-out); }
+.form-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.form-error { color: #C9453A; font-size: 14.5px; text-align: center; margin-top: 14px; }
+.form-error[hidden] { display: none; }
+.form-error a { color: inherit; font-weight: 600; text-decoration: underline; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
 @media (max-width: 960px) { .contact-grid { grid-template-columns: 1fr; } }
 @media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
