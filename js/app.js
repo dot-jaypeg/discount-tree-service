@@ -210,7 +210,7 @@
   /* ---------- Estimate form -> GoHighLevel ----------
      Posts straight from the browser to the GHL inbound webhook (no server).
      Show success only on a 2xx; on failure, point the visitor to the phone. */
-  var GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/khYD7nTdnL0vNubv57I8/webhook-trigger/30242eb1-1a00-43bf-acb0-ea65cb06ead0';
+  var GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/khYD7nTdnL0vNubv57I8/webhook-trigger/ffc3d0e3-9a04-4306-8dd2-427fbd19f772';
   var ATTR_KEY = 'dt_attr';
   var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
 
